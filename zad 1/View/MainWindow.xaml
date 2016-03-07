@@ -1,0 +1,228 @@
+﻿<Window x:Class="zad_1.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:zad_1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Label Content="Nazwa nowej bazy danych" Margin="10"/>
+            <Button Grid.Column="2"
+                Content="Stwórz nową bazę danych" 
+                Margin="10" 
+                Name="btnCreateDataBase"
+                Command="{Binding CreateDatabaseCommand}"/>
+            <TextBox Grid.Column="1" 
+                     Margin="10"
+                     x:Name="txbDatabaseName"
+                     Text="{Binding NewDatabaseName, Mode=TwoWay, 
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="1" 
+                   Content="Wybór pliku bazy danych" 
+                   Margin="10"/>
+            <TextBox Grid.Column="1" Grid.Row="1" 
+                     Margin="10" 
+                     Name="txbFilePath"
+                     Text="{Binding ExtistingDatabaseName}"/>
+            <Button Grid.Row="1" Grid.Column="2" 
+                    Margin="10" 
+                    Name="btnCreateNewFile" 
+                    Content="Wybierz"
+                    Command="{Binding LoadDatabaseCommand}"/>
+
+            <Separator Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Label Content="Podgląd danych" Margin="5"/>
+            <Button Grid.Column="1" 
+                    Name="btnDeleteContact" 
+                    Content="usuń kontakt" 
+                    Margin="3"
+                    Command="{Binding DeleteContactCommand}"/>
+            <Label Grid.Row="1" Content="Lista kontaktów:" Margin="5"/>
+            <ListView Grid.Row="2" Grid.RowSpan="3" 
+                     Margin="5"
+                     ItemsSource="{Binding ContactList}"
+                     SelectedIndex="{Binding SelectedContactIndexList, 
+                                        Mode=TwoWay, 
+                                        UpdateSourceTrigger=PropertyChanged}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Imię" DisplayMemberBinding="{Binding FirstName}"/>
+                        <GridViewColumn Header="Nazwisko" DisplayMemberBinding="{Binding LastName}"/>
+                    </GridView>
+                </ListView.View>
+
+            </ListView>
+
+
+
+            <Label Grid.Column="1" Grid.Row="1" Margin="5" Content="Telefony:" HorizontalAlignment="Left"/>
+            <ListView Grid.Column="1" Grid.Row="2" Grid.RowSpan="3" 
+                     Margin="5"
+                     ItemsSource="{Binding ContactTelephpones}"
+                     SelectedIndex="{Binding SelectedTelephoneIndex, 
+                                        Mode=TwoWay, 
+                                        UpdateSourceTrigger=PropertyChanged}">
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Numer" DisplayMemberBinding="{Binding Number}"/>
+                        <GridViewColumn Header="Operator" DisplayMemberBinding="{Binding Operator}"/>
+                        <GridViewColumn Header="Typ" DisplayMemberBinding="{Binding Type}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+                     
+
+            <Label Grid.Column="2" Grid.Row="1" Margin="5" Content="Adres:" HorizontalAlignment="Left"/>
+
+            <Label Grid.Column="2" Grid.Row="2" 
+                   HorizontalAlignment="Left" 
+                   Name="lblStreetAddress"
+                   Content="{Binding ContactAddressStreet}"/>
+            <Label Grid.Column="2" Grid.Row="3"
+                   HorizontalAlignment="Left" 
+                   Name="lblCityAddress"
+                   Content="{Binding ContactAddressCity}"/>
+            <Label Grid.Column="2" Grid.Row="4" 
+                   HorizontalAlignment="Left" 
+                   Name="lblPostCodeAddress"
+                   Content="{Binding ContactPostCode}"/>
+
+            <Separator Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Label Content="Edycja danych"/>
+
+            <Button Grid.Column="1" Grid.ColumnSpan="2" 
+                    Name="btnAddNewContact" 
+                    Content="Dodaj nowy kontakt" 
+                    Margin="3"
+                    Command="{Binding AddNewContactCommand}"/>
+            <Button Grid.Column="0" Grid.Row="5" 
+                    Name="btnClearTextBoxes" 
+                    Content="Wyczyść pola" 
+                    Margin="3"
+                    Command="{Binding ClearTextBoxesCommand}"/>
+            <Button Grid.Column="1" Grid.Row="5" 
+                    Name="btnEditContact" 
+                    Margin="2" 
+                    Content="Edytuj kontakt"
+                    Command="{Binding EditContactCommand}"/>
+            <Button Grid.Column="2" Grid.Row="5" 
+                    Name="btnAddNewTelephone" 
+                    Margin="2" 
+                    Content="Dodaj telefon"
+                    Command="{Binding AddNewPhoneCommand}"/>
+            <Button Grid.Column="3" Grid.Row="5" 
+                    Name="btnEditTelephone" 
+                    Margin="2" 
+                    Content="Edytuj telefon"
+                    Command="{Binding EditTelephoneCommand}"/>
+            <Button Grid.Column="4" Grid.Row="5" 
+                    Name="btnDeleteTelephone" 
+                    Margin="2" 
+                    Content="Usuń telefon"
+                    Command="{Binding DeleteTelephoneCommand}"/>
+            <Button Grid.Column="5" Grid.Row="5" 
+                    Name="btnEditAddress" 
+                    Margin="2" 
+                    Content="Edytuj adres"
+                    Command="{Binding EditAddressCommand}"/>
+
+            <Label Grid.Column="1" Grid.Row="1" Content="Imię"/>
+            <TextBox Grid.Column="1" Grid.Row="2" 
+                     Name="txbContactFirstName" 
+                     Margin="2"
+                     Text="{Binding ContactFirstName}"/>
+            <Label Grid.Column="1" Grid.Row="3" Content="Nazwisko"/>
+            <TextBox Grid.Column="1" Grid.Row="4" 
+                     Name="txbContactLastName" 
+                     Margin="2"
+                     Text="{Binding ContactLastName}"/>
+
+            <Label Grid.Column="2" Grid.Row="1" Content="Telefon"/>
+            <Label Grid.Column="2" Grid.Row="2" Content="Numer"/>
+            <Label Grid.Column="2" Grid.Row="3" Content="Operator"/>
+            <Label Grid.Column="2" Grid.Row="4" Content="Typ"/>
+
+            <TextBox Grid.Column="3" Grid.Row="2" 
+                     Name="txbPhoneNumber" 
+                     Margin="2"
+                     Text="{Binding ContactTelephoneNumber}"/>
+            <TextBox Grid.Column="3" Grid.Row="3" 
+                     Name="txbPhoneOperator" 
+                     Margin="2"
+                     Text="{Binding ContactPhoneOperator}"/>
+            <TextBox Grid.Column="3" Grid.Row="4" 
+                     Name="txbPhoneType" 
+                     Margin="2"
+                     Text="{Binding ContactPhoneType}"/>
+
+            <Label Grid.Column="4" Grid.Row="1" Content="Adres"/>
+            <Label Grid.Column="4" Grid.Row="2" Content="Ulica"/>
+            <Label Grid.Column="4" Grid.Row="3" Content="Miasto"/>
+            <Label Grid.Column="4" Grid.Row="4" Content="Kod pocztowy"/>
+
+            <TextBox Grid.Column="5" Grid.Row="2" 
+                     Name="txbStreet" 
+                     Margin="2"
+                     Text="{Binding ContactAddressStreet}"/>
+            <TextBox Grid.Column="5" Grid.Row="3" 
+                     Name="txbCity" 
+                     Margin="2"
+                     Text="{Binding ContactAddressCity}"/>
+            <TextBox Grid.Column="5" Grid.Row="4" 
+                     Name="txbPostCode" 
+                     Margin="2"
+                     Text="{Binding ContactPostCode}"/>
+
+        </Grid>
+    </Grid>
+</Window>
