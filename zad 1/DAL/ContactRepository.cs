@@ -13,9 +13,9 @@ namespace zad_1.DAL
         private IEmbeddedConfiguration _config;
         private IObjectContainer _database;
 
-        public List<Telephone> _telephones;
-        public Address _address;
-        public List<Contact> Contacts;
+        public List<Telephone> Telephones { get; set; }
+        public Address ContactAddress { get; set; }
+        public List<Contact> Contacts { get; set; }
         public Contact Contact { get; set; }
         public string DatabaseName { get; set; }
 
@@ -40,8 +40,6 @@ namespace zad_1.DAL
                 OpenDatabase();
             }
         }
-
-
         public void OpenDatabase()
         {
             MainWindowViewModel.DatabaseOpen = true;
@@ -79,13 +77,14 @@ namespace zad_1.DAL
         public void GetTelephones(Contact contact)
         {
             GetContact(contact);
-            _telephones = Contact.Telephones.ToList();
+            Telephones = Contact.Telephones.ToList();
+            
         }
 
         public void GetAddress(Contact selectedContact)
         {
             GetContact(selectedContact);
-            _address = Contact.Address;
+            ContactAddress = Contact.Address;
         }
 
         public void AddContact(Contact newContact)
@@ -105,7 +104,6 @@ namespace zad_1.DAL
                 _database.Commit();
             }
         }
-
         public void DeleteContact(Contact selectedContact)
         {
             SetConfigureDelete();
@@ -114,17 +112,16 @@ namespace zad_1.DAL
             if (Contact != null)
             {
                 GetTelephones(selectedContact);
-                var tel = Contact.Telephones;
+                var tel = Contact.Telephones.ToList();
                 foreach (var item in tel)
-                    _database.Delete(item);               
-           
-                _database.Delete(Contact.Address); 
-                _database.Delete(Contact);
+                    DeleteTelephone(item, selectedContact);
 
+                _database.Delete(Contact.Address);
+                _database.Store(Contact);
+
+                _database.Delete(Contact);
             }
         }
-
-
         public void AddTelephone(Telephone newTelephone, Contact selectedContact)
         {
             SetConfigUpdate();
@@ -132,20 +129,16 @@ namespace zad_1.DAL
             GetContact(selectedContact);
             Contact.Telephones.Add(newTelephone);
             _database.Store(Contact);
-            //  _database.Commit();
-            //var e = ShowAllData();
         }
         public void DeleteTelephone(Telephone selectedTelephone, Contact selectedContact)
-        {
+        {            
             SetConfigureDelete();
             GetContact(selectedContact);
-
+            Contact.Telephones.RemoveAll(x => x == null);
             var tel = Contact.Telephones.Where(x => x.Number == selectedTelephone.Number).FirstOrDefault();
             _database.Delete(tel);
             Contact.Telephones.Remove(tel);
-            Contact.Telephones.RemoveAll(x => x == null);
             _database.Store(Contact);
-
         }
 
         public void EditAddress(Address newAddress, Contact selectedContact)
@@ -177,15 +170,11 @@ namespace zad_1.DAL
 
             if (selectedTelephone != null)
             {
-                var d = ShowAllData();
                 _database.Delete(selectedTelephone);
-                var e = ShowAllData();
                 Contact.Telephones.Remove(selectedTelephone);
                 Contact.Telephones.RemoveAll(x => x == null);
                 Contact.Telephones.Add(newTelephone);
-                var f = ShowAllData();
                 _database.Store(Contact);
-                var g = ShowAllData();
             }
         }
     }

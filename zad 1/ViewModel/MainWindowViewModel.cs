@@ -164,7 +164,19 @@ namespace zad_1.ViewModel
         {
             _contactRepository.GetTelephones(ContactList[SelectedContactIndexList]);
             if (ContactList[SelectedContactIndexList].Telephones.Any())
-                ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository._telephones);
+            {
+                ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
+                int x = ContactTelephpones.Count();
+                for (int i = 0; i < x; i++)
+                {
+                    if (ContactTelephpones[i] == null)
+                    {
+                        ContactTelephpones.Remove(ContactTelephpones[i]);
+                        i--;
+                        x--;
+                    }                        
+                }
+            }                               
         }
         private void AddNewContact(object obj)
         {
