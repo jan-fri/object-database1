@@ -102,22 +102,46 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-                     
+
 
             <Label Grid.Column="2" Grid.Row="1" Margin="5" Content="Adres:" HorizontalAlignment="Left"/>
 
-            <Label Grid.Column="2" Grid.Row="2" 
+            <DockPanel Grid.Column="2" Grid.Row="2">
+                <Label 
                    HorizontalAlignment="Left" 
                    Name="lblStreetAddress"
-                   Content="{Binding ContactAddressStreet}"/>
-            <Label Grid.Column="2" Grid.Row="3"
+                   Content="{Binding ContactAddressStreetLabel}"/>
+                <Label 
                    HorizontalAlignment="Left" 
                    Name="lblCityAddress"
-                   Content="{Binding ContactAddressCity}"/>
-            <Label Grid.Column="2" Grid.Row="4" 
+                   Content="{Binding ContactAddressCityLabel}"/>
+                <Label  
                    HorizontalAlignment="Left" 
                    Name="lblPostCodeAddress"
-                   Content="{Binding ContactPostCode}"/>
+                   Content="{Binding ContactPostCodeLabel}"/>
+            </DockPanel>
+            <DockPanel Grid.Column="2" Grid.Row="3">
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="Ilość kontaktów w bazie:"/>
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="{Binding NumberOfContacts}"/>
+            </DockPanel>
+            <DockPanel Grid.Column="2" Grid.Row="4">
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="Ilość telefonów:"/>
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="{Binding NumberOfTelephones}"/>
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="Ilość adresów:"/>
+                <Label 
+                   HorizontalAlignment="Left" 
+                   Content="{Binding NumberOfAddresses}"/>
+            </DockPanel>
 
             <Separator Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
         </Grid>

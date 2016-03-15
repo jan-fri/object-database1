@@ -29,6 +29,12 @@ namespace zad_1.ViewModel
         public string ContactAddressStreet { get; set; }
         public string ContactAddressCity { get; set; }
         public string ContactPostCode { get; set; }
+        public string ContactAddressStreetLabel { get; set; }
+        public string ContactAddressCityLabel { get; set; }
+        public string ContactPostCodeLabel { get; set; }
+        public string NumberOfContacts { get; set; }
+        public string NumberOfTelephones { get; set; }
+        public string NumberOfAddresses { get; set; }
 
         public ICommand CreateDatabaseCommand { get; set; }
         public ICommand LoadDatabaseCommand { get; set; }
@@ -61,6 +67,7 @@ namespace zad_1.ViewModel
 
             if (ContactList.Any())
             {
+                GetAddress();
                 ContactAddressStreet = ContactList[SelectedContactIndexList].Address.Street;
                 ContactAddressCity = ContactList[SelectedContactIndexList].Address.City;
                 ContactPostCode = ContactList[SelectedContactIndexList].Address.PostCode;
@@ -87,6 +94,20 @@ namespace zad_1.ViewModel
                 ContactPhoneOperator = ContactTelephpones[SelectedTelephoneIndex].Operator;
                 ContactPhoneType = ContactTelephpones[SelectedTelephoneIndex].Type;
             }
+        }
+        private void GetAddress()
+        {
+            ContactAddressStreetLabel = ContactList[SelectedContactIndexList].Address.Street;
+            ContactAddressCityLabel = ContactList[SelectedContactIndexList].Address.City;
+            ContactPostCodeLabel = ContactList[SelectedContactIndexList].Address.PostCode;
+        }
+
+        private void GetNumberofObjectsInDatabase()
+        {
+            NumberOfAddresses = _contactRepository.Addresses.Count.ToString();
+            NumberOfContacts = _contactRepository.Contacts.Count.ToString();
+            NumberOfTelephones = _contactRepository.Telephones.Count.ToString();
+
         }
         public MainWindowViewModel()
         {
@@ -152,13 +173,18 @@ namespace zad_1.ViewModel
                     SelectedTelephoneIndex = 0;
                     GetTelephoneDetails();
                 }
+                _contactRepository.GetAllObjetsInDatabase();
+                GetNumberofObjectsInDatabase();
             }
         }
         private void RefreshContactLists()
         {
             _contactRepository.GetAllContacts();
             if (_contactRepository.Contacts.Any())
+            {
                 ContactList = new ObservableCollection<Contact>(_contactRepository.Contacts);
+                GetAddress();
+            }
         }
         private void RefreshTelephones()
         {
@@ -166,16 +192,16 @@ namespace zad_1.ViewModel
             if (ContactList[SelectedContactIndexList].Telephones.Any())
             {
                 ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
-                int x = ContactTelephpones.Count();
-                for (int i = 0; i < x; i++)
-                {
-                    if (ContactTelephpones[i] == null)
-                    {
-                        ContactTelephpones.Remove(ContactTelephpones[i]);
-                        i--;
-                        x--;
-                    }                        
-                }
+                //int x = ContactTelephpones.Count();
+                //for (int i = 0; i < x; i++)
+                //{
+                //    if (ContactTelephpones[i] == null)
+                //    {
+                //        ContactTelephpones.Remove(ContactTelephpones[i]);
+                //        i--;
+                //        x--;
+                //    }                        
+                //}
             }                               
         }
         private void AddNewContact(object obj)

@@ -14,6 +14,7 @@ namespace zad_1.DAL
         private IObjectContainer _database;
 
         public List<Telephone> Telephones { get; set; }
+        public List<Address> Addresses { get; set; }
         public Address ContactAddress { get; set; }
         public List<Contact> Contacts { get; set; }
         public Contact Contact { get; set; }
@@ -22,7 +23,9 @@ namespace zad_1.DAL
         public void SetConfigUpdate()
         {
             _config = Db4oEmbedded.NewConfiguration();
-            _config.Common.ObjectClass(typeof(Contact)).CascadeOnUpdate(true);
+            //_config.UpdateDepth(int.MaxValue);
+            _config.Common.UpdateDepth = int.MaxValue;
+            //_config.Common.ObjectClass(typeof(Contact)).CascadeOnUpdate(true);
             if (MainWindowViewModel.DatabaseOpen)
             {
                 CloseDatabase();
@@ -33,7 +36,8 @@ namespace zad_1.DAL
         public void SetConfigureDelete()
         {
             _config = Db4oEmbedded.NewConfiguration();
-            _config.Common.ObjectClass(typeof(Contact)).CascadeOnDelete(true);
+            _config.Common.UpdateDepth = int.MaxValue;
+            //_config.Common.ObjectClass(typeof(Contact)).CascadeOnDelete(true);
             if (MainWindowViewModel.DatabaseOpen)
             {
                 CloseDatabase();
@@ -54,17 +58,26 @@ namespace zad_1.DAL
             MainWindowViewModel.DatabaseOpen = false;
             _database.Close();
         }
+        public void GetAllObjectsInDatabase()
+        {
+            GetAllAddresses();
+            GetAllContacts();
+            GetAllTelephones();
+        }
         public void GetAllContacts()
         {
             Contacts = (from Contact contact in _database
                         select contact).ToList();
         }
-        public List<Telephone> ShowAllData()
+        public void GetAllAddresses()
         {
-            var result = (from Telephone t in _database
+            Addresses = (from Address a in _database
+                         select a).ToList();
+        }
+        public void GetAllTelephones()
+        {
+            Telephones = (from Telephone t in _database
                           select t).ToList();
-
-            return result;
         }
 
         public void GetContact(Contact contact)
@@ -102,6 +115,8 @@ namespace zad_1.DAL
 
                 _database.Store(Contact);
                 _database.Commit();
+
+                GetAllObjectsInDatabase();
             }
         }
         public void DeleteContact(Contact selectedContact)
@@ -112,33 +127,42 @@ namespace zad_1.DAL
             if (Contact != null)
             {
                 GetTelephones(selectedContact);
-                var tel = Contact.Telephones.ToList();
-                foreach (var item in tel)
-                    DeleteTelephone(item, selectedContact);
-
+                //var tel = Contact.Telephones.ToList();
+                //foreach (var item in tel)
+                //    _database.Delete(item);
+                Contact.Telephones.Clear();
+               
                 _database.Delete(Contact.Address);
-                _database.Store(Contact);
-
                 _database.Delete(Contact);
-            }
+                _database.Commit();
+
+                GetAllObjectsInDatabase();            }
         }
         public void AddTelephone(Telephone newTelephone, Contact selectedContact)
         {
             SetConfigUpdate();
-
             GetContact(selectedContact);
             Contact.Telephones.Add(newTelephone);
             _database.Store(Contact);
+            _database.Commit();
+
+            GetAllObjectsInDatabase();
         }
         public void DeleteTelephone(Telephone selectedTelephone, Contact selectedContact)
         {            
             SetConfigureDelete();
             GetContact(selectedContact);
-            Contact.Telephones.RemoveAll(x => x == null);
-            var tel = Contact.Telephones.Where(x => x.Number == selectedTelephone.Number).FirstOrDefault();
-            _database.Delete(tel);
-            Contact.Telephones.Remove(tel);
+            var telToRemove = Contact.Telephones.Where(x => x.Number == selectedTelephone.Number).FirstOrDefault();
+            var contactTelephones = Contact.Telephones;
+            List<Telephone> tmpTelephones = new List<Telephone>(Contact.Telephones);
+            tmpTelephones.Remove(telToRemove);
+            Contact.Telephones.Clear();
+            Contact.Telephones = tmpTelephones;
+            _database.Delete(telToRemove);          
             _database.Store(Contact);
+            _database.Commit();
+
+            GetAllObjectsInDatabase();
         }
 
         public void EditAddress(Address newAddress, Contact selectedContact)
@@ -148,6 +172,9 @@ namespace zad_1.DAL
 
             Contact.Address = newAddress;
             _database.Store(Contact);
+            _database.Commit();
+
+            GetAllObjectsInDatabase();
         }
 
         public void EditContact(Contact newContact, Contact selectedContact)
@@ -158,6 +185,9 @@ namespace zad_1.DAL
             Contact.FirstName = newContact.FirstName;
             Contact.LastName = newContact.LastName;
             _database.Store(Contact);
+            _database.Commit();
+
+            GetAllObjectsInDatabase();
 
         }
 
@@ -175,7 +205,10 @@ namespace zad_1.DAL
                 Contact.Telephones.RemoveAll(x => x == null);
                 Contact.Telephones.Add(newTelephone);
                 _database.Store(Contact);
+                _database.Commit();
             }
+
+            GetAllObjectsInDatabase();  
         }
     }
 }
