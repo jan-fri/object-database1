@@ -127,16 +127,17 @@ namespace zad_1.DAL
             if (Contact != null)
             {
                 GetTelephones(selectedContact);
-                //var tel = Contact.Telephones.ToList();
-                //foreach (var item in tel)
-                //    _database.Delete(item);
+                var telephonesList = new List<Telephone>(Telephones);
+                foreach (var item in telephonesList)
+                    _database.Delete(item);
+
                 Contact.Telephones.Clear();
-               
                 _database.Delete(Contact.Address);
                 _database.Delete(Contact);
                 _database.Commit();
 
-                GetAllObjectsInDatabase();            }
+                GetAllObjectsInDatabase();
+            }
         }
         public void AddTelephone(Telephone newTelephone, Contact selectedContact)
         {
@@ -153,12 +154,9 @@ namespace zad_1.DAL
             SetConfigureDelete();
             GetContact(selectedContact);
             var telToRemove = Contact.Telephones.Where(x => x.Number == selectedTelephone.Number).FirstOrDefault();
-            var contactTelephones = Contact.Telephones;
-            List<Telephone> tmpTelephones = new List<Telephone>(Contact.Telephones);
-            tmpTelephones.Remove(telToRemove);
-            Contact.Telephones.Clear();
-            Contact.Telephones = tmpTelephones;
-            _database.Delete(telToRemove);          
+
+            _database.Delete(telToRemove);
+            Contact.Telephones.Remove(telToRemove);
             _database.Store(Contact);
             _database.Commit();
 

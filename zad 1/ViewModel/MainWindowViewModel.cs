@@ -173,7 +173,7 @@ namespace zad_1.ViewModel
                     SelectedTelephoneIndex = 0;
                     GetTelephoneDetails();
                 }
-                _contactRepository.GetAllObjetsInDatabase();
+                _contactRepository.GetAllObjectsInDatabase();
                 GetNumberofObjectsInDatabase();
             }
         }
@@ -192,16 +192,6 @@ namespace zad_1.ViewModel
             if (ContactList[SelectedContactIndexList].Telephones.Any())
             {
                 ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
-                //int x = ContactTelephpones.Count();
-                //for (int i = 0; i < x; i++)
-                //{
-                //    if (ContactTelephpones[i] == null)
-                //    {
-                //        ContactTelephpones.Remove(ContactTelephpones[i]);
-                //        i--;
-                //        x--;
-                //    }                        
-                //}
             }                               
         }
         private void AddNewContact(object obj)
@@ -226,8 +216,11 @@ namespace zad_1.ViewModel
             contact.Address = address;
 
             _contactRepository.AddContact(contact);
+
             RefreshContactLists();
             RefreshTelephones();
+            _contactRepository.GetAllObjectsInDatabase();
+            GetNumberofObjectsInDatabase();
         }
         private void AddNewPhone(object obj)
         {
@@ -239,14 +232,20 @@ namespace zad_1.ViewModel
             };
 
             _contactRepository.AddTelephone(newTelephone, ContactList[SelectedContactIndexList]);
+
             RefreshContactLists();
             SelectedTelephoneIndex = ContactTelephpones.Count() - 1;
+            _contactRepository.GetAllObjectsInDatabase();
+            GetNumberofObjectsInDatabase();
         }
         private void DeleteTelephone(object obj)
         {
             _contactRepository.DeleteTelephone(ContactTelephpones[SelectedTelephoneIndex], ContactList[SelectedContactIndexList]);
             SelectedTelephoneIndex = 0;
+
             RefreshContactLists();
+            _contactRepository.GetAllObjectsInDatabase();
+            GetNumberofObjectsInDatabase();
         }
         private void EditAddress(object obj)
         {
@@ -309,6 +308,8 @@ namespace zad_1.ViewModel
         {
             _contactRepository.DeleteContact(ContactList[SelectedContactIndexList]);
             RefreshContactLists();
+            _contactRepository.GetAllObjectsInDatabase();
+            GetNumberofObjectsInDatabase();
         }
 
 
