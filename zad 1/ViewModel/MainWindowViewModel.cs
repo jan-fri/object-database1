@@ -7,6 +7,7 @@ using System.Windows.Input;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using zad_1.DAL;
 using zad_1.Model;
+using System.Collections.Generic;
 
 namespace zad_1.ViewModel
 {
@@ -68,11 +69,22 @@ namespace zad_1.ViewModel
             if (ContactList.Any())
             {
                 GetAddress();
-                ContactAddressStreet = ContactList[SelectedContactIndexList].Address.Street;
-                ContactAddressCity = ContactList[SelectedContactIndexList].Address.City;
-                ContactPostCode = ContactList[SelectedContactIndexList].Address.PostCode;
-                ContactFirstName = ContactList[SelectedContactIndexList].FirstName;
-                ContactLastName = ContactList[SelectedContactIndexList].LastName;
+                if (ContactList[SelectedContactIndexList].Address != null)
+                {
+                    ContactAddressStreet = ContactList[SelectedContactIndexList].Address.Street;
+                    ContactAddressCity = ContactList[SelectedContactIndexList].Address.City;
+                    ContactPostCode = ContactList[SelectedContactIndexList].Address.PostCode;
+                    ContactFirstName = ContactList[SelectedContactIndexList].FirstName;
+                    ContactLastName = ContactList[SelectedContactIndexList].LastName;
+                }
+                else
+                {
+                    ContactAddressStreet = string.Empty;
+                    ContactAddressCity = string.Empty;
+                    ContactPostCode = string.Empty;
+                    ContactFirstName = string.Empty;
+                    ContactLastName = string.Empty;
+                }
             }
         }
         public int SelectedTelephoneIndex
@@ -97,9 +109,13 @@ namespace zad_1.ViewModel
         }
         private void GetAddress()
         {
-            ContactAddressStreetLabel = ContactList[SelectedContactIndexList].Address.Street;
-            ContactAddressCityLabel = ContactList[SelectedContactIndexList].Address.City;
-            ContactPostCodeLabel = ContactList[SelectedContactIndexList].Address.PostCode;
+            if (ContactList[SelectedContactIndexList].Address != null)
+            {
+                ContactAddressStreetLabel = ContactList[SelectedContactIndexList].Address.Street;
+                ContactAddressCityLabel = ContactList[SelectedContactIndexList].Address.City;
+                ContactPostCodeLabel = ContactList[SelectedContactIndexList].Address.PostCode;
+            }
+            
         }
 
         private void GetNumberofObjectsInDatabase()
@@ -189,31 +205,44 @@ namespace zad_1.ViewModel
         private void RefreshTelephones()
         {
             _contactRepository.GetTelephones(ContactList[SelectedContactIndexList]);
-            if (ContactList[SelectedContactIndexList].Telephones.Any())
+            if (ContactList[SelectedContactIndexList].Telephones != null)
             {
                 ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
-            }                               
+            } 
+            else
+            {
+                ContactTelephpones = new ObservableCollection<Telephone>();
+            }                              
         }
         private void AddNewContact(object obj)
         {
-            Telephone newTelephone = new Telephone
-            {
-                Number = ContactTelephoneNumber,
-                Operator = ContactPhoneOperator,
-                Type = ContactPhoneType
-            };
-            Address address = new Address
-            {
-                City = ContactAddressCity,
-                PostCode = ContactPostCode,
-                Street = ContactAddressStreet
-            };
-
             Contact contact = new Contact();
+            if (ContactTelephoneNumber != 0)
+            {
+                Telephone newTelephone = new Telephone
+                {
+                    Number = ContactTelephoneNumber,
+                    Operator = ContactPhoneOperator,
+                    Type = ContactPhoneType
+                };
+                contact.Telephones = new List<Telephone>();
+                contact.Telephones.Add(newTelephone);
+            }
+
+            if (!string.IsNullOrEmpty(ContactAddressStreet))
+            {
+                Address address = new Address
+                {
+                    City = ContactAddressCity,
+                    PostCode = ContactPostCode,
+                    Street = "ul. " + ContactAddressStreet
+                };
+                contact.Address = new Address();
+                contact.Address = address;
+            }
+
             contact.FirstName = ContactFirstName;
             contact.LastName = ContactLastName;
-            contact.Telephones.Add(newTelephone);
-            contact.Address = address;
 
             _contactRepository.AddContact(contact);
 

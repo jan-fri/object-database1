@@ -12,12 +12,5 @@ namespace zad_1.Model
         public string LastName { get; set; }
         public Address Address { get; set; }
         public List<Telephone> Telephones { get; set; }
-        public Contact()
-        {
-            Address = new Address();
-            Telephones = new List<Telephone>();
-        }
-
-
     }
 }

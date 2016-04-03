@@ -90,7 +90,8 @@ namespace zad_1.DAL
         public void GetTelephones(Contact contact)
         {
             GetContact(contact);
-            Telephones = Contact.Telephones.ToList();
+            if (Contact.Telephones != null)
+                Telephones = Contact.Telephones.ToList();
             
         }
 
@@ -110,8 +111,20 @@ namespace zad_1.DAL
                 Contact = new Contact();
                 Contact.FirstName = newContact.FirstName;
                 Contact.LastName = newContact.LastName;
-                Contact.Address = newContact.Address;
-                Contact.Telephones.Add(newContact.Telephones.First());
+
+                if (newContact.Telephones != null)
+                {
+                    Contact.Telephones = new List<Telephone>();
+                    Contact.Telephones.Add(newContact.Telephones.First());
+                }
+                    
+
+                if (newContact.Address != null)
+                {
+                    Contact.Address = new Address();
+                    Contact.Address = newContact.Address;
+                }
+                    
 
                 _database.Store(Contact);
                 _database.Commit();
@@ -132,7 +145,10 @@ namespace zad_1.DAL
                     _database.Delete(item);
 
                 Contact.Telephones.Clear();
-                _database.Delete(Contact.Address);
+
+                if (Contact.Address !=null)
+                    _database.Delete(Contact.Address);
+
                 _database.Delete(Contact);
                 _database.Commit();
 
@@ -143,6 +159,8 @@ namespace zad_1.DAL
         {
             SetConfigUpdate();
             GetContact(selectedContact);
+            if (Contact.Telephones == null)
+                Contact.Telephones = new List<Telephone>();
             Contact.Telephones.Add(newTelephone);
             _database.Store(Contact);
             _database.Commit();
@@ -167,6 +185,8 @@ namespace zad_1.DAL
         {
             SetConfigUpdate();
             GetContact(selectedContact);
+            if (Contact.Address == null)
+                Contact.Address = new Address();
 
             Contact.Address = newAddress;
             _database.Store(Contact);
