@@ -50,7 +50,7 @@ namespace zad_1.ViewModel
 
         public ObservableCollection<Contact> ContactList { get; set; }
         public ObservableCollection<Telephone> ContactTelephpones { get; set; }
-        public ObservableCollection<Telephone> te { get; set; }
+
         public int SelectedContactIndexList
         {
             get { return _selectedContactIndexList; }
@@ -68,22 +68,34 @@ namespace zad_1.ViewModel
 
             if (ContactList.Any())
             {
-                GetAddress();
+                if (ContactList[SelectedContactIndexList].FirstName !=null)
+                {
+                    ContactFirstName = ContactList[SelectedContactIndexList].FirstName;
+                    ContactLastName = ContactList[SelectedContactIndexList].LastName;
+                }
+                else
+                {
+                    ContactFirstName = string.Empty;
+                    ContactLastName = string.Empty;
+                }
+
                 if (ContactList[SelectedContactIndexList].Address != null)
                 {
                     ContactAddressStreet = ContactList[SelectedContactIndexList].Address.Street;
                     ContactAddressCity = ContactList[SelectedContactIndexList].Address.City;
                     ContactPostCode = ContactList[SelectedContactIndexList].Address.PostCode;
-                    ContactFirstName = ContactList[SelectedContactIndexList].FirstName;
-                    ContactLastName = ContactList[SelectedContactIndexList].LastName;
+                    ContactAddressStreetLabel = "ul. " + ContactList[SelectedContactIndexList].Address.Street;
+                    ContactAddressCityLabel = ContactList[SelectedContactIndexList].Address.City;
+                    ContactPostCodeLabel = ContactList[SelectedContactIndexList].Address.PostCode;
                 }
                 else
                 {
                     ContactAddressStreet = string.Empty;
                     ContactAddressCity = string.Empty;
                     ContactPostCode = string.Empty;
-                    ContactFirstName = string.Empty;
-                    ContactLastName = string.Empty;
+                    ContactAddressStreetLabel = string.Empty;
+                    ContactAddressCityLabel = string.Empty;
+                    ContactPostCodeLabel = string.Empty;
                 }
             }
         }
@@ -106,18 +118,13 @@ namespace zad_1.ViewModel
                 ContactPhoneOperator = ContactTelephpones[SelectedTelephoneIndex].Operator;
                 ContactPhoneType = ContactTelephpones[SelectedTelephoneIndex].Type;
             }
-        }
-        private void GetAddress()
-        {
-            if (ContactList[SelectedContactIndexList].Address != null)
+            else
             {
-                ContactAddressStreetLabel = ContactList[SelectedContactIndexList].Address.Street;
-                ContactAddressCityLabel = ContactList[SelectedContactIndexList].Address.City;
-                ContactPostCodeLabel = ContactList[SelectedContactIndexList].Address.PostCode;
+                ContactTelephoneNumber = 0;
+                ContactPhoneOperator = string.Empty;
+                ContactPhoneType = string.Empty;
             }
-            
         }
-
         private void GetNumberofObjectsInDatabase()
         {
             NumberOfAddresses = _contactRepository.Addresses.Count.ToString();
@@ -128,6 +135,8 @@ namespace zad_1.ViewModel
         public MainWindowViewModel()
         {
             NewDatabaseName = string.Empty;
+            ContactList = new ObservableCollection<Contact>();
+            ContactTelephpones = new ObservableCollection<Telephone>();
             CreateDatabaseCommand = new RelayCommand(CreateDatabase, CheckDatabaseName);
             LoadDatabaseCommand = new RelayCommand(LoadDatabase);
             DeleteContactCommand = new RelayCommand(DeleteContact, CheckIfContactExists);
@@ -135,18 +144,24 @@ namespace zad_1.ViewModel
             ClearTextBoxesCommand = new RelayCommand(ClearText);
             EditContactCommand = new RelayCommand(EditContact, CheckIfContactExists);
             AddNewPhoneCommand = new RelayCommand(AddNewPhone, CheckIfContactExists);
-            EditTelephoneCommand = new RelayCommand(EditTelephone, CheckIfContactExists);
-            DeleteTelephoneCommand = new RelayCommand(DeleteTelephone, CheckIfContactExists);
+            EditTelephoneCommand = new RelayCommand(EditTelephone, CheckIfTelephoneExists);
+            DeleteTelephoneCommand = new RelayCommand(DeleteTelephone, CheckIfTelephoneExists);
             EditAddressCommand = new RelayCommand(EditAddress, CheckIfContactExists);
             _contactRepository = new ContactRepository();
-            ContactList = new ObservableCollection<Contact>();
-            ContactTelephpones = new ObservableCollection<Telephone>();
+           
         }
         private bool CheckIfContactExists(object obj)
         {
             if (!ContactList.Any())
                 return false;
             return true;
+        }
+        private bool CheckIfTelephoneExists(object obj)
+        {
+
+            if (ContactTelephpones.Any())
+                return true;                
+            return false;
         }
         private bool CheckDatabaseName(object obj)
         {
@@ -186,7 +201,6 @@ namespace zad_1.ViewModel
                 if (ContactList.Count > 0)
                 {
                     RefreshTelephones();
-                    SelectedTelephoneIndex = 0;
                     GetTelephoneDetails();
                 }
                 _contactRepository.GetAllObjectsInDatabase();
@@ -199,20 +213,19 @@ namespace zad_1.ViewModel
             if (_contactRepository.Contacts.Any())
             {
                 ContactList = new ObservableCollection<Contact>(_contactRepository.Contacts);
-                GetAddress();
+                GetContactDetails();
             }
         }
         private void RefreshTelephones()
         {
-            _contactRepository.GetTelephones(ContactList[SelectedContactIndexList]);
-            if (ContactList[SelectedContactIndexList].Telephones != null)
+            if (ContactList.Any())
             {
-                ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
-            } 
-            else
-            {
-                ContactTelephpones = new ObservableCollection<Telephone>();
-            }                              
+                _contactRepository.GetTelephones(ContactList[SelectedContactIndexList]);
+                if (_contactRepository.Telephones != null)
+                    ContactTelephpones = new ObservableCollection<Telephone>(_contactRepository.Telephones);
+                else
+                    ContactTelephpones = new ObservableCollection<Telephone>(); 
+            }
         }
         private void AddNewContact(object obj)
         {
@@ -227,6 +240,8 @@ namespace zad_1.ViewModel
                 };
                 contact.Telephones = new List<Telephone>();
                 contact.Telephones.Add(newTelephone);
+
+                ContactTelephpones.Add(newTelephone);
             }
 
             if (!string.IsNullOrEmpty(ContactAddressStreet))
@@ -235,7 +250,7 @@ namespace zad_1.ViewModel
                 {
                     City = ContactAddressCity,
                     PostCode = ContactPostCode,
-                    Street = "ul. " + ContactAddressStreet
+                    Street = ContactAddressStreet
                 };
                 contact.Address = new Address();
                 contact.Address = address;
@@ -245,10 +260,10 @@ namespace zad_1.ViewModel
             contact.LastName = ContactLastName;
 
             _contactRepository.AddContact(contact);
-
-            RefreshContactLists();
-            RefreshTelephones();
-            _contactRepository.GetAllObjectsInDatabase();
+            ContactList.Add(contact);
+            
+            GetContactDetails();
+            GetTelephoneDetails();
             GetNumberofObjectsInDatabase();
         }
         private void AddNewPhone(object obj)
@@ -261,19 +276,13 @@ namespace zad_1.ViewModel
             };
 
             _contactRepository.AddTelephone(newTelephone, ContactList[SelectedContactIndexList]);
-
-            RefreshContactLists();
-            SelectedTelephoneIndex = ContactTelephpones.Count() - 1;
-            _contactRepository.GetAllObjectsInDatabase();
+            ContactTelephpones.Add(newTelephone);
             GetNumberofObjectsInDatabase();
         }
         private void DeleteTelephone(object obj)
         {
             _contactRepository.DeleteTelephone(ContactTelephpones[SelectedTelephoneIndex], ContactList[SelectedContactIndexList]);
-            SelectedTelephoneIndex = 0;
-
-            RefreshContactLists();
-            _contactRepository.GetAllObjectsInDatabase();
+            ContactTelephpones.Remove(ContactTelephpones[SelectedTelephoneIndex]);
             GetNumberofObjectsInDatabase();
         }
         private void EditAddress(object obj)
@@ -286,7 +295,9 @@ namespace zad_1.ViewModel
             };
 
             _contactRepository.EditAddress(newAddress, ContactList[SelectedContactIndexList]);
-            RefreshContactLists();
+            ContactList[SelectedContactIndexList].Address = newAddress;
+            GetContactDetails();
+            GetNumberofObjectsInDatabase();
         }        
         private void EditTelephone(object obj)
         {
@@ -297,30 +308,20 @@ namespace zad_1.ViewModel
                 Type = ContactPhoneType
             };
             _contactRepository.EditTelephone(newTelephone, ContactTelephpones[SelectedTelephoneIndex], ContactList[SelectedContactIndexList]);
-            RefreshContactLists();
+            ContactTelephpones[SelectedTelephoneIndex] = newTelephone;
+            GetTelephoneDetails();
+            GetNumberofObjectsInDatabase();
         }
         private void EditContact(object obj)
         {
-            Telephone newTelephone = new Telephone
-            {
-                Number = ContactTelephoneNumber,
-                Operator = ContactPhoneOperator,
-                Type = ContactPhoneType
-            };
-            Address address = new Address
-            {
-                City = ContactAddressCity,
-                PostCode = ContactPostCode,
-                Street = ContactAddressStreet
-            };
             Contact newContact = new Contact();
             newContact.FirstName = ContactFirstName;
             newContact.LastName = ContactLastName;
-            newContact.Telephones.Add(newTelephone);
-            newContact.Address = address;
 
             _contactRepository.EditContact(newContact, ContactList[SelectedContactIndexList]);
-            RefreshContactLists();
+
+            EditAddress(true);
+            EditTelephone(true);
         }
         private void ClearText(object obj)
         {            
@@ -336,13 +337,9 @@ namespace zad_1.ViewModel
         private void DeleteContact(object obj)
         {
             _contactRepository.DeleteContact(ContactList[SelectedContactIndexList]);
-            RefreshContactLists();
-            _contactRepository.GetAllObjectsInDatabase();
+            ContactList.Remove(ContactList[SelectedContactIndexList]);
+            RefreshTelephones();
             GetNumberofObjectsInDatabase();
         }
-
-
-
-
     }
 }

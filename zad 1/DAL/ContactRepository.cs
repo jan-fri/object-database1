@@ -52,7 +52,6 @@ namespace zad_1.DAL
             else
                 _database = Db4oEmbedded.OpenFile(DatabaseName);
         }
-
         public void CloseDatabase()
         {
             MainWindowViewModel.DatabaseOpen = false;
@@ -79,7 +78,6 @@ namespace zad_1.DAL
             Telephones = (from Telephone t in _database
                           select t).ToList();
         }
-
         public void GetContact(Contact contact)
         {
             Contact = new Contact();
@@ -92,15 +90,14 @@ namespace zad_1.DAL
             GetContact(contact);
             if (Contact.Telephones != null)
                 Telephones = Contact.Telephones.ToList();
-            
+            else
+                Telephones = null;       
         }
-
         public void GetAddress(Contact selectedContact)
         {
             GetContact(selectedContact);
             ContactAddress = Contact.Address;
         }
-
         public void AddContact(Contact newContact)
         {
             SetConfigUpdate();
@@ -180,7 +177,6 @@ namespace zad_1.DAL
 
             GetAllObjectsInDatabase();
         }
-
         public void EditAddress(Address newAddress, Contact selectedContact)
         {
             SetConfigUpdate();
@@ -206,9 +202,7 @@ namespace zad_1.DAL
             _database.Commit();
 
             GetAllObjectsInDatabase();
-
         }
-
         public void EditTelephone(Telephone newTelephone, Telephone oldTelephone, Contact selectedContact)
         {
             SetConfigUpdate();
