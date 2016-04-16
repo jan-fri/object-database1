@@ -229,42 +229,52 @@ namespace zad_1.ViewModel
         }
         private void AddNewContact(object obj)
         {
-            Contact contact = new Contact();
-            if (ContactTelephoneNumber != 0)
+            bool contactExist = false;
+            if (ContactList.Any())
             {
-                Telephone newTelephone = new Telephone
-                {
-                    Number = ContactTelephoneNumber,
-                    Operator = ContactPhoneOperator,
-                    Type = ContactPhoneType
-                };
-                contact.Telephones = new List<Telephone>();
-                contact.Telephones.Add(newTelephone);
-
-                ContactTelephpones.Add(newTelephone);
+                if (ContactList[SelectedContactIndexList].FirstName == ContactFirstName && ContactList[SelectedContactIndexList].LastName == ContactLastName)
+                    contactExist = true;
             }
 
-            if (!string.IsNullOrEmpty(ContactAddressStreet))
+            if (!contactExist)
             {
-                Address address = new Address
+                Contact contact = new Contact();
+                if (ContactTelephoneNumber != 0)
                 {
-                    City = ContactAddressCity,
-                    PostCode = ContactPostCode,
-                    Street = ContactAddressStreet
-                };
-                contact.Address = new Address();
-                contact.Address = address;
+                    Telephone newTelephone = new Telephone
+                    {
+                        Number = ContactTelephoneNumber,
+                        Operator = ContactPhoneOperator,
+                        Type = ContactPhoneType
+                    };
+                    contact.Telephones = new List<Telephone>();
+                    contact.Telephones.Add(newTelephone);
+
+                    ContactTelephpones.Add(newTelephone);
+                }
+
+                if (!string.IsNullOrEmpty(ContactAddressStreet))
+                {
+                    Address address = new Address
+                    {
+                        City = ContactAddressCity,
+                        PostCode = ContactPostCode,
+                        Street = ContactAddressStreet
+                    };
+                    contact.Address = new Address();
+                    contact.Address = address;
+                }
+
+                contact.FirstName = ContactFirstName;
+                contact.LastName = ContactLastName;
+
+                _contactRepository.AddContact(contact);
+                ContactList.Add(contact);
+
+                GetContactDetails();
+                GetTelephoneDetails();
+                GetNumberofObjectsInDatabase(); 
             }
-
-            contact.FirstName = ContactFirstName;
-            contact.LastName = ContactLastName;
-
-            _contactRepository.AddContact(contact);
-            ContactList.Add(contact);
-            
-            GetContactDetails();
-            GetTelephoneDetails();
-            GetNumberofObjectsInDatabase();
         }
         private void AddNewPhone(object obj)
         {
